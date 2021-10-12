@@ -1,4 +1,5 @@
-import { NextPage } from "next";
+import type { NextPage } from "next";
+import Link from "next/link";
 import {
   Button,
   Box,
@@ -13,6 +14,7 @@ import {
   Td,
   Th,
   Text,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { RiAddLine, RiPencilLine } from "react-icons/ri";
 
@@ -21,6 +23,10 @@ import { Sidebar } from "../../components/Sidebar";
 import { Pagination } from "../../components/Pagination";
 
 const Users: NextPage = () => {
+  const isWideVersion = useBreakpointValue({
+    base: false,
+    lg: true,
+  });
   return (
     <Box>
       <Header />
@@ -34,33 +40,34 @@ const Users: NextPage = () => {
               Usuários
             </Heading>
 
-            <Button
-              href="/users/create"
-              as="a"
-              size="sm"
-              fontSize="sm"
-              colorScheme="pink"
-              leftIcon={<Icon as={RiAddLine} fontSize="20" />}
-            >
-              Criar novo usuário
-            </Button>
+            <Link href="/users/create" passHref>
+              <Button
+                as="a"
+                size="sm"
+                fontSize="sm"
+                colorScheme="pink"
+                leftIcon={<Icon as={RiAddLine} fontSize="20" />}
+              >
+                Criar novo usuário
+              </Button>
+            </Link>
           </Flex>
 
           <Table colorScheme="whiteAlpha">
             <Thead>
               <Tr>
-                <Th px="6" color="gray.300" w="8">
+                <Th px={["4", "4", "6"]} color="gray.300" w="8">
                   <Checkbox colorScheme="pink" />
                 </Th>
                 <Th>Usuário</Th>
-                <Th>Data de cadastro</Th>
+                {isWideVersion && <Th>Data de cadastro</Th>}
                 <Th w="8"></Th>
               </Tr>
             </Thead>
 
             <Tbody>
               <Tr>
-                <Td px="6">
+                <Td px={["4", "4", "6"]}>
                   <Checkbox colorScheme="pink" />
                 </Td>
                 <Td>
@@ -71,7 +78,7 @@ const Users: NextPage = () => {
                     </Text>
                   </Box>
                 </Td>
-                <Td>30 de Março, 2021</Td>
+                {isWideVersion && <Td>30 de Março, 2021</Td>}
                 <Td>
                   <Button
                     as="a"
@@ -80,7 +87,7 @@ const Users: NextPage = () => {
                     colorScheme="purple"
                     leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
                   >
-                    Editar
+                    {isWideVersion && "Editar"}
                   </Button>
                 </Td>
               </Tr>
