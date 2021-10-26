@@ -34,22 +34,30 @@ type User = {
 };
 
 const Users: NextPage = () => {
-  const { data, isLoading, error } = useQuery<User[]>("users", async () => {
-    const response = await fetch("/api/users");
-    const data = await response.json();
-    const users = data.users.map((user: User) => ({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      created_at: new Date(user.createdAt).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      }),
-    }));
+  const { data, isLoading, isFetching, error } = useQuery<User[]>(
+    "users",
+    async () => {
+      const response = await fetch("/api/users");
+      const data = await response.json();
+      const users = data.users.map(
+        (user: User) => ({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          created_at: new Date(user.createdAt).toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          }),
+        }),
+        {
+          saleTime: 1000 * 60 * 5, // 5 minutes (in milliseconds)
+        }
+      );
 
-    return users;
-  });
+      return users;
+    }
+  );
 
   const isWideVersion = useBreakpointValue({
     base: false,
@@ -67,6 +75,9 @@ const Users: NextPage = () => {
           <Flex mb="8" justify="space-between" align="center">
             <Heading size="lg" fontWeight="normal">
               Usuários
+              {!isLoading && isFetching && (
+                <Spinner size="sm" color="gray.500" ml="4" />
+              )}
             </Heading>
 
             <Link href="/users/create" passHref>
