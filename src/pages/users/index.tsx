@@ -24,6 +24,7 @@ import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { Pagination } from "../../components/Pagination";
 import React from "react";
+import { api } from "../../services/api";
 
 type User = {
   id: number;
@@ -37,8 +38,8 @@ const Users: NextPage = () => {
   const { data, isLoading, isFetching, error } = useQuery<User[]>(
     "users",
     async () => {
-      const response = await fetch("/api/users");
-      const data = await response.json();
+      const { data } = await api.get("users");
+
       const users = data.users.map(
         (user: User) => ({
           id: user.id,
