@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { NextPage } from "next";
+import type { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
 import {
   Button,
@@ -24,13 +24,21 @@ import { RiAddLine, RiPencilLine } from "react-icons/ri";
 import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { Pagination } from "../../components/Pagination";
-import { useUsers } from "../../services/hooks/useUsers";
+import { getUsers, User, useUsers } from "../../services/hooks/useUsers";
 import { queryClient } from "../../services/queryClient";
 import { api } from "../../services/api";
 
-const Users: NextPage = () => {
+type UsersProps = {
+  users: User[];
+  totalCount: number;
+};
+
+const Users: NextPage<UsersProps> = ({ users, totalCount }) => {
   const [page, setPage] = useState(1);
-  const { data, isLoading, isFetching, error } = useUsers(page);
+  const { data, isLoading, isFetching, error } = useUsers(page, {
+    users,
+    totalCount,
+  });
 
   const isWideVersion = useBreakpointValue({
     base: false,
@@ -140,7 +148,7 @@ const Users: NextPage = () => {
               </Table>
 
               <Pagination
-                totalCountOfRegisters={data?.totalCount || 0}
+                totalCountOfRegisters={data?.totalCount || totalCount || 0}
                 currentPage={page}
                 onPageChange={setPage}
               />
@@ -150,6 +158,17 @@ const Users: NextPage = () => {
       </Flex>
     </Box>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const { users, totalCount } = await getUsers(1);
+
+  return {
+    props: {
+      users,
+      totalCount,
+    },
+  };
 };
 
 export default Users;
