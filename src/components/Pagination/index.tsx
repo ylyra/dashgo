@@ -85,12 +85,12 @@ export function Pagination({
 
         {currentPage + siblingsCount < lastPage && (
           <>
-            <PaginationItem onPageChange={onPageChange} number={lastPage} />
             {currentPage + 1 + siblingsCount < lastPage && (
               <Text color="gray.300" w="8" textAlign="center">
                 ...
               </Text>
             )}
+            <PaginationItem onPageChange={onPageChange} number={lastPage} />
           </>
         )}
       </HStack>
