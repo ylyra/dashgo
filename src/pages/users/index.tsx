@@ -38,11 +38,17 @@ const Users: NextPage = () => {
   });
 
   async function handlePrefetchUser(userId: number) {
-    await queryClient.prefetchQuery(["user", userId], async () => {
-      const response = await api.get(`/users/${userId}`);
+    await queryClient.prefetchQuery(
+      ["user", userId],
+      async () => {
+        const response = await api.get(`/users/${userId}`);
 
-      return response.data;
-    });
+        return response.data;
+      },
+      {
+        staleTime: 1000 * 60 * 10, // 10 minutes
+      }
+    );
   }
 
   return (
