@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import type { NextPage } from "next";
 import Link from "next/link";
 import {
@@ -8,6 +8,7 @@ import {
   Flex,
   Heading,
   Icon,
+  Link as ChakraLink,
   Table,
   Tbody,
   Thead,
@@ -24,14 +25,25 @@ import { Header } from "../../components/Header";
 import { Sidebar } from "../../components/Sidebar";
 import { Pagination } from "../../components/Pagination";
 import { useUsers } from "../../services/hooks/useUsers";
+import { queryClient } from "../../services/queryClient";
+import { api } from "../../services/api";
 
 const Users: NextPage = () => {
-  const { data, isLoading, isFetching, error } = useUsers();
+  const [page, setPage] = useState(1);
+  const { data, isLoading, isFetching, error } = useUsers(page);
 
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true,
   });
+
+  async function handlePrefetchUser(userId: number) {
+    await queryClient.prefetchQuery(["user", userId], async () => {
+      const response = await api.get(`/users/${userId}`);
+
+      return response.data;
+    });
+  }
 
   return (
     <Box>
@@ -86,14 +98,19 @@ const Users: NextPage = () => {
 
                 <Tbody>
                   {data !== undefined &&
-                    data.map((user) => (
+                    data.users.map((user) => (
                       <Tr key={user.id}>
                         <Td px={["4", "4", "6"]}>
                           <Checkbox colorScheme="pink" />
                         </Td>
                         <Td>
                           <Box>
-                            <Text fontWeight="bold">{user.name}</Text>
+                            <ChakraLink
+                              color="purple.500"
+                              onMouseEnter={() => handlePrefetchUser(user.id)}
+                            >
+                              <Text fontWeight="bold">{user.name}</Text>
+                            </ChakraLink>
                             <Text fontSize="sm" color="gray.300">
                               {user.email}
                             </Text>
@@ -116,7 +133,11 @@ const Users: NextPage = () => {
                 </Tbody>
               </Table>
 
-              <Pagination />
+              <Pagination
+                totalCountOfRegisters={data?.totalCount || 0}
+                currentPage={page}
+                onPageChange={setPage}
+              />
             </>
           )}
         </Box>
